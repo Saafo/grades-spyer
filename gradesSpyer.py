@@ -27,9 +27,6 @@ class Mymail:
         self.smtp_server = '请在这里填写服务端邮箱stmp服务器地址'#示例：'smtp.163.com'
         self.pop3_server = '请在这里填写服务端邮箱pop3服务器地址'#示例：'pop3.163.com'
         self.server = smtplib.SMTP(self.smtp_server, 25)
-        # self.server.set_debuglevel(1)    # 打印出和SMTP服务器交互的所有信息
-        # self.server.login(from_addr, password)   # 登录SMTP服务器
-        # self.server.sendmail(from_addr, [to_addr], msg.as_string())    # 发邮件
 
     def mailMeInfo(self,state,content):
         if(state == 0):
@@ -48,17 +45,6 @@ class Mymail:
 
 
     def mailMeCaptcha(self,state):
-        #上传图片 #TODO删掉
-        # image_filename = os.path.basename('./screenshot.png')
-        # Headers = {"Authorization":"dhlfCDRwzzuy5vc6dhz6riZ9nMVSEAKJ"}
-        # files = {'smfile': (image_filename,open('./captchaImg.png','rb'))}
-        # url = "https://sm.ms/api/v2/upload/"
-        # Response = requests.post(url,headers=Headers,files=files)
-        # Data = Response.json()
-        # Success = Data['success']
-        # capatchaUrl = ""
-        # if(Success == "true"):
-        #     capatchaUrl = Data['data']['url']
         #构造邮件
         if(state == 0):
             subject = '登录失效，请回复验证码以重新登录'
@@ -75,7 +61,6 @@ class Mymail:
         img = open('./captchaImg.png','rb')
         msgImage = MIMEImage(img.read())
         img.close()
-        # msgImage.add_header('Content-ID','<captchaImg>')
         msg.attach(msgImage)
         html = '''
         <html>
@@ -86,8 +71,6 @@ class Mymail:
           </body>
         <html>
         '''
-            # <br>验证码上传成功状态：'''+str(Success)+'''</br>
-            # <br><img src='cid:captchaImg'></br> 加了这排网易就会报554,b'DT:SPM垃圾邮件报错，迫不得已注释掉
         htm = MIMEText(html,'html','utf-8')
         msg.attach(htm)
         #发邮件
@@ -115,28 +98,20 @@ class Mymail:
             sent_pic_captcha_time = float(f.read())
 
         # 开始循环
-        # counter = 0 # 计数菌#TODO删除
         while (True):
             time.sleep(120)
             # 连接到POP3服务器:
             server = poplib.POP3(self.pop3_server)
             # 可以打开或关闭调试信息:
             server.set_debuglevel(1)
-            # 可选:打印POP3服务器的欢迎文字:
-            # print(server.getwelcome().decode('utf-8'))
             # 身份认证:
             server.user(self.from_addr)
             server.pass_(self.password)
-            # stat()返回邮件数量和占用空间:
-            # print('Messages: %s. Size: %s' % server.stat())
             # list()返回所有邮件的编号:
             resp, mails, octets = server.list()
-            # 可以查看返回的列表类似[b'1 82923', b'2 2184', ...]
-            # print(mails)
             for index in range(len(mails),len(mails)-5,-1):
                 resp, lines, octets = server.retr(index)
-                # lines存储了邮件的原始文本的每一行,
-                # 可以获得整个邮件的原始文本:
+                # lines存储了邮件的原始文本的每一行,可以获得整个邮件的原始文本:
                 msg_content = b'\r\n'.join(lines).decode('utf-8')
                 # 准备解析邮件:
                 msg = Parser().parsestr(msg_content)
@@ -152,15 +127,6 @@ class Mymail:
                     break
                 continue
             server.quit()
-            # if(counter < 2):
-            # time.sleep(120)
-            #     counter += 1
-            # elif(counter < 5):
-            #     time.sleep(300)
-            #     counter += 1
-            # else:
-            #     time.sleep(1800)
-            #     counter = 0
 
 
 def captchaShot():
@@ -240,12 +206,12 @@ def compare():
                             unrecord_subject_indexs.append(i)
                 #如果有新增项
                 if(unrecord_subject_indexs != []):
-                    mail_string = "科目名称 , 分数：\n"
+                    mail_string = "科目名称,分数：\n"
                     with open("./finalscore.txt",'a+') as f:
                         for item in unrecord_subject_indexs:
                             td = tr[item].find_elements_by_tag_name("td")
                             f.write(td[3].text+','+td[6].text+'\n')
-                            mail_string += td[3].text+' , '+td[6].text+'\n'
+                            mail_string += td[3].text+','+td[6].text+'\n'
                     mymail.mailMeInfo(0,mail_string)
             #平时成绩查询
             driver.get("http://eams.uestc.edu.cn/eams/home!childmenus.action?menu.id=844")
@@ -278,12 +244,12 @@ def compare():
                             unrecord_subject_indexs.append(i)
                 #如果有新增项
                 if(unrecord_subject_indexs != []):
-                    mail_string = "科目名称,分数：\n"
+                    mail_string = "科目名称 , 分数：\n"
                     with open("./usualscore.txt",'a+') as f:
                         for item in unrecord_subject_indexs:
                             td = tr[item].find_elements_by_tag_name("td")
                             f.write(td[3].text+','+td[6].text+'\n')
-                            mail_string += td[3].text+','+td[6].text+'\n'
+                            mail_string += td[3].text+' , '+td[6].text+'\n'
                     mymail.mailMeInfo(2,mail_string)
 
             time.sleep(300)
@@ -292,9 +258,6 @@ def compare():
                 pass
             else:
                 restart()
-        # except Exception as e:
-        #     mymail.mailMeInfo(1,'错误信息：\n' + str(e))
-        #     restart()
 
 
 def restart():
@@ -304,13 +267,7 @@ def restart():
 
 
 def main(manual):
-    # ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36"
-    # options = webdriver.ChromeOptions()
-    # options.add_argument("user-agent="+ua)
-    # options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    # driver = webdriver.Chrome(chrome_options=options,executable_path='./chromedriver')#chrome_options=browser)
     if(login(2,manual)): #登录
-        # driver.get(final_score_table_url)
         compare()
     else: #重启程序
         restart()

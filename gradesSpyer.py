@@ -282,7 +282,7 @@ if __name__ == '__main__':
         print('参数错误！')
         exit(-1)
     for opt, arg in opts:
-        if opt in ('-m','-manual'):
+        if opt in ('-m','--manual'):
             manual = 1
         else:
             manual = 0

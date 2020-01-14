@@ -137,3 +137,4 @@ dmypy.json
 chromedriver
 geckodriver
 geckodriver.log
+*test*

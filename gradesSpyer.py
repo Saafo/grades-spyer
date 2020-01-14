@@ -252,7 +252,7 @@ def compare():
                             mail_string += td[3].text+' , '+td[6].text+'\n'
                     mymail.mailMeInfo(2,mail_string)
 
-            time.sleep(300)
+            time.sleep(300) # 默认5分钟（300秒）刷新一次，不建议更频繁
         except NoSuchElementException:
             if(login(0,0)):
                 pass

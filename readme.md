@@ -6,7 +6,7 @@
 * `Python 3` 以上版本，[点击下载](https://www.python.org/)
 * pip
 * `Selenium 2.0` 以上版本
-* `firefox 浏览器` [点击下载](http://www.firefox.com.cn/) | [为什么不用Chrome](#关于没有采用Chrome的问题：)
+* `firefox 浏览器` [点击下载](http://www.firefox.com.cn/) | [为什么不用Chrome](#关于没有采用Chrome的问题)
 * `geckodriver`用于selenium控制firefox的程序，[点击下载](https://github.com/mozilla/geckodriver/releases)
 ## 准备工作：
 * 你的一个**很少接收邮件的邮箱**作为发送信息的`服务端邮箱`
@@ -51,11 +51,14 @@
 * screenshot.png 截图文件
 * captchaImg.png 验证码截图文件
 ## 刷新频率：
-* 默认5分钟刷新一次，可以在line 255 行更改，但不建议更频繁，因为学校的银杏服务器还是蛮不容易的。
+* 默认5分钟刷新一次，可以在line 255 更改，但不建议更频繁，因为学校的银杏服务器还是蛮不容易的。
 * 服务端邮箱收验证码邮件的频率是2分钟一次，登录时请耐心等待。
 ## 其他说明：
 ### 关于没有采用Chrome的问题：
 Chrome的驱动程序chromedriver似乎是由第三方开发的，所以在用selenium控制Chrome时页面会与人工操作有些许不同，具体到本项目则是信息门户登录时，无法显示验证码，无奈只能用Firefox
 ### 关于人工打码的问题：
-信息门户的验证码似乎是自动生成的，但某些参数可能调得比较夸张，实测用pytesseract识别的效果很不好，所以还是采取人工打码的方式完成验证。比如，下面的验证码不是itzl，因为信息门户的验证码是5位字母。别问我是什么，我也不知道。  
+信息门户的验证码似乎是自动生成的，但某些参数可能调得比较夸张，实测用pytesseract识别的效果很不好，所以还是采取人工打码的方式完成验证。  
+比如，下面的验证码不是itzl，因为信息门户的验证码是5位字母。别问我是什么，我也不知道。  
 ![image.png](https://i.loli.net/2020/01/14/epoqmbX3EiHhuIA.png)
+
+Copyright &copy; 2020 Saafo. All Rights Reserved.

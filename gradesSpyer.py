@@ -78,7 +78,7 @@ class Mymail:
         self.server.set_debuglevel(1)    # 打印出和SMTP服务器交互的所有信息
         self.server.login(self.from_addr, self.password)   # 登录SMTP服务器
         self.server.sendmail(self.from_addr, [self.to_addr], msg.as_string())    # 发邮件
-        with open("./time.txt",'w') as f: #记录最近发送验证码的时间
+        with open("./time.txt",'w',encoding='utf-8') as f: #记录最近发送验证码的时间
             f.write(str(time.time()))
 
     def recvCaptcha(self):
@@ -95,7 +95,7 @@ class Mymail:
             if charset:
                 value = value.decode(charset)
             return value
-        with open("./time.txt",'r') as f: #读取最近发送验证码的时间
+        with open("./time.txt",'r',encoding='utf-8') as f: #读取最近发送验证码的时间
             sent_pic_captcha_time = float(f.read())
 
         # 开始循环
@@ -130,7 +130,6 @@ class Mymail:
                     continue
                 server.quit()
         except KeyboardInterrupt:
-            server.quit()
             safequit()
 
 
@@ -191,12 +190,12 @@ def compare():
             tr = table.find_element_by_tag_name("tbody").find_elements_by_tag_name("tr")
             num = len(tr)
             if(os.path.exists("./finalscore.txt") == False): #如果还没有已存在的记录
-                with open("./finalscore.txt",'w') as f:
+                with open("./finalscore.txt",'w',encoding='utf-8') as f:
                     for i in range(num):
                         td = tr[i].find_elements_by_tag_name("td")
                         f.write(td[3].text+','+td[6].text+'\n')
             else: #如果已经有存在记录，则遍历查找不同
-                with open("./finalscore.txt",'r') as f:
+                with open("./finalscore.txt",'r',encoding='utf-8') as f:
                     records = f.readlines()
                 record_subject_names = []
                 unrecord_subject_indexs = []
@@ -214,7 +213,7 @@ def compare():
                 #如果有新增项
                 if(unrecord_subject_indexs != []):
                     mail_string = "科目名称 , 分数：\n"
-                    with open("./finalscore.txt",'a+') as f:
+                    with open("./finalscore.txt",'a+',encoding='utf-8') as f:
                         for item in unrecord_subject_indexs:
                             td = tr[item].find_elements_by_tag_name("td")
                             f.write(td[3].text+','+td[6].text+'\n')
@@ -229,12 +228,12 @@ def compare():
             tr = table.find_element_by_tag_name("tbody").find_elements_by_tag_name("tr")
             num = len(tr)
             if(os.path.exists("./usualscore.txt") == False): #如果还没有已存在的记录
-                with open("./usualscore.txt",'w') as f:
+                with open("./usualscore.txt",'w',encoding='utf-8') as f:
                     for i in range(num):
                         td = tr[i].find_elements_by_tag_name("td")
                         f.write(td[3].text+','+td[6].text+'\n')
             else: #如果已经有存在记录，则遍历查找不同
-                with open("./usualscore.txt",'r') as f:
+                with open("./usualscore.txt",'r',encoding='utf-8') as f:
                     records = f.readlines()
                 record_subject_names = []
                 unrecord_subject_indexs = []
@@ -252,7 +251,7 @@ def compare():
                 #如果有新增项
                 if(unrecord_subject_indexs != []):
                     mail_string = "科目名称 , 分数：\n"
-                    with open("./usualscore.txt",'a+') as f:
+                    with open("./usualscore.txt",'a+',encoding='utf-8') as f:
                         for item in unrecord_subject_indexs:
                             td = tr[item].find_elements_by_tag_name("td")
                             f.write(td[3].text+','+td[6].text+'\n')
@@ -279,7 +278,7 @@ def safequit():
     os._exit(0)
 
 def log(info):
-    with open('./log.txt','a+') as f:
+    with open('./log.txt','a+',encoding='utf-8') as f:
         f.write(time.asctime(time.localtime(time.time())) + '\n' + info + '\n')
 
 

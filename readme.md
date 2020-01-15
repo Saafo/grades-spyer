@@ -27,7 +27,7 @@
   * line 153-154 添加信息门户账号密码
 * 配置 `geckodriver`：
   * 将`geckodriver`或`geckodriver.exe`(Windows)文件放在文件目录下
-  * Windows环境需要将
+  * Windows环境需要将line 307`./geckodriver`改为`./geckodriver.exe`
 * 运行程序：
   * 参数说明：  
     可以直接运行程序：

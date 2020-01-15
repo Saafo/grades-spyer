@@ -28,6 +28,8 @@
 * 配置 `geckodriver`：
   * 将`geckodriver`或`geckodriver.exe`(Windows)文件放在文件目录下
   * Windows环境需要将line 307`./geckodriver`改为`./geckodriver.exe`
+* 分辨率设置：
+  * 在非2k屏上运行的时候四个长度应该删除line 147 `* 2`
 * 运行程序：
   * 参数说明：  
     可以直接运行程序：

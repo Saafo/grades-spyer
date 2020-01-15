@@ -22,7 +22,7 @@ from email.parser import Parser
 class Mymail:
     def __init__(self):
         self.from_addr = '请在这里填写服务端邮箱' #发送邮箱
-        self.password = '请在这里填写服务端邮箱密码' #邮箱密码
+        self.password = '请在这里填写服务端邮箱授权码' #邮箱密码
         self.to_addr = '请在这里填写接收通知的邮箱' #收信息邮箱
         self.smtp_server = '请在这里填写服务端邮箱stmp服务器地址'#示例：'smtp.163.com'
         self.pop3_server = '请在这里填写服务端邮箱pop3服务器地址'#示例：'pop3.163.com'
@@ -35,6 +35,7 @@ class Mymail:
             subject = '程序运行产生错误，已重启程序'
         elif(state == 2):
             subject = '你有新的平时成绩发布'
+        log(subject+'\n'+content)
         msg = MIMEText(content,'plain','utf-8')
         msg['subject'] = Header(subject,'utf-8')
         msg['from'] = 'GradesSpyer<'+self.from_addr+'>'
@@ -206,12 +207,12 @@ def compare():
                             unrecord_subject_indexs.append(i)
                 #如果有新增项
                 if(unrecord_subject_indexs != []):
-                    mail_string = "科目名称,分数：\n"
+                    mail_string = "科目名称 , 分数：\n"
                     with open("./finalscore.txt",'a+') as f:
                         for item in unrecord_subject_indexs:
                             td = tr[item].find_elements_by_tag_name("td")
                             f.write(td[3].text+','+td[6].text+'\n')
-                            mail_string += td[3].text+','+td[6].text+'\n'
+                            mail_string += td[3].text+' , '+td[6].text+'\n'
                     mymail.mailMeInfo(0,mail_string)
             #平时成绩查询
             driver.get("http://eams.uestc.edu.cn/eams/home!childmenus.action?menu.id=844")
@@ -251,7 +252,7 @@ def compare():
                             f.write(td[3].text+','+td[6].text+'\n')
                             mail_string += td[3].text+' , '+td[6].text+'\n'
                     mymail.mailMeInfo(2,mail_string)
-
+            log('已成功刷新成绩数据\n')
             time.sleep(300) # 默认5分钟（300秒）刷新一次，不建议更频繁
         except NoSuchElementException:
             if(login(0,0)):
@@ -264,6 +265,10 @@ def restart():
     driver.quit()
     python = sys.executable
     os.execl(python,python,sys.argv[0])
+
+def log(info):
+    with open('./log.txt','a+') as f:
+        f.write(time.asctime(time.localtime(time.time())) + '\n' + info + '\n')
 
 
 def main(manual):
@@ -293,8 +298,7 @@ if __name__ == '__main__':
     try: 
         main(manual)
     except BaseException:
-        with open('./log.txt','a+') as f:
-            f.write(time.asctime(time.localtime(time.time())) + '\n' + traceback.format_exc())
+        log(traceback.format_exc())
         mymail.mailMeInfo(1,time.asctime(time.localtime(time.time())) + '\n' +'错误信息：\n' + traceback.format_exc())
     finally: #不行就重启 重启能解决99%的问题
         restart()

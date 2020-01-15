@@ -99,35 +99,39 @@ class Mymail:
             sent_pic_captcha_time = float(f.read())
 
         # 开始循环
-        while (True):
-            time.sleep(120)
-            # 连接到POP3服务器:
-            server = poplib.POP3(self.pop3_server)
-            # 可以打开或关闭调试信息:
-            server.set_debuglevel(1)
-            # 身份认证:
-            server.user(self.from_addr)
-            server.pass_(self.password)
-            # list()返回所有邮件的编号:
-            resp, mails, octets = server.list()
-            for index in range(len(mails),len(mails)-5,-1):
-                resp, lines, octets = server.retr(index)
-                # lines存储了邮件的原始文本的每一行,可以获得整个邮件的原始文本:
-                msg_content = b'\r\n'.join(lines).decode('utf-8')
-                # 准备解析邮件:
-                msg = Parser().parsestr(msg_content)
-                raw_info_from = msg.get("From")
-                hdr, from_addr = parseaddr(raw_info_from)
-                if(from_addr == mymail.to_addr): #如果是指定邮箱发回来的邮件
-                    sent_string_captcha_time = time.mktime(time.strptime(msg.get("Date")[0:24], '%a, %d %b %Y %H:%M:%S'))
-                    #如果最近一条指定邮箱发来的邮件比最近发送的验证码时间晚 +100:修正163服务器与本地时间差
-                    if(sent_string_captcha_time + 100 > sent_pic_captcha_time): 
-                        captcha = decode_str(msg.get("Subject"))
-                        server.quit()
-                        return captcha
-                    break
-                continue
+        try:
+            while (True):
+                time.sleep(120)
+                # 连接到POP3服务器:
+                server = poplib.POP3(self.pop3_server)
+                # 可以打开或关闭调试信息:
+                server.set_debuglevel(1)
+                # 身份认证:
+                server.user(self.from_addr)
+                server.pass_(self.password)
+                # list()返回所有邮件的编号:
+                resp, mails, octets = server.list()
+                for index in range(len(mails),len(mails)-5,-1):
+                    resp, lines, octets = server.retr(index)
+                    # lines存储了邮件的原始文本的每一行,可以获得整个邮件的原始文本:
+                    msg_content = b'\r\n'.join(lines).decode('utf-8')
+                    # 准备解析邮件:
+                    msg = Parser().parsestr(msg_content)
+                    raw_info_from = msg.get("From")
+                    hdr, from_addr = parseaddr(raw_info_from)
+                    if(from_addr == mymail.to_addr): #如果是指定邮箱发回来的邮件
+                        sent_string_captcha_time = time.mktime(time.strptime(msg.get("Date")[0:24], '%a, %d %b %Y %H:%M:%S'))
+                        #如果最近一条指定邮箱发来的邮件比最近发送的验证码时间晚 +100:修正163服务器与本地时间差
+                        if(sent_string_captcha_time + 100 > sent_pic_captcha_time): 
+                            captcha = decode_str(msg.get("Subject"))
+                            server.quit()
+                            return captcha
+                        break
+                    continue
+                server.quit()
+        except KeyboardInterrupt:
             server.quit()
+            safequit()
 
 
 def captchaShot():
@@ -161,6 +165,8 @@ def login(state,manual):
                 time.sleep(3)
         time.sleep(5)
         driver.find_elements_by_class_name("auth_login_btn")[0].click() #如果还停留在登录页，点击登录
+    except KeyboardInterrupt:
+        safequit()
     finally:
         time.sleep(2)
         try:
@@ -254,6 +260,8 @@ def compare():
                     mymail.mailMeInfo(2,mail_string)
             log('已成功刷新成绩数据\n')
             time.sleep(300) # 默认5分钟（300秒）刷新一次，不建议更频繁
+            except KeyboardInterrupt:
+            safequit()
         except NoSuchElementException:
             if(login(0,0)):
                 pass
@@ -265,6 +273,10 @@ def restart():
     driver.quit()
     python = sys.executable
     os.execl(python,python,sys.argv[0])
+
+def safequit():
+    driver.quit()
+    os._exit(0)
 
 def log(info):
     with open('./log.txt','a+') as f:
@@ -297,6 +309,8 @@ if __name__ == '__main__':
     final_score_table_url = "http://eams.uestc.edu.cn/eams/teach/grade/course/person!search.action?semesterId=243&projectType="
     try: 
         main(manual)
+    except KeyboardInterrupt:
+        safequit()
     except BaseException:
         log(traceback.format_exc())
         mymail.mailMeInfo(1,time.asctime(time.localtime(time.time())) + '\n' +'错误信息：\n' + traceback.format_exc())

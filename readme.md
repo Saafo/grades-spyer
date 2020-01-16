@@ -6,6 +6,7 @@
 * `Python 3` 以上版本，[点击下载](https://www.python.org/)
 * pip
 * `Selenium 2.0` 以上版本
+* `Pillow`库
 * GUI环境
 * `firefox 浏览器` [点击下载](http://www.firefox.com.cn/) | [为什么不用Chrome](#关于没有采用Chrome的问题)
 * `geckodriver`：用于selenium控制firefox的程序，[点击下载](https://github.com/mozilla/geckodriver/releases)
@@ -18,6 +19,10 @@
 * 安装Selenium:
     ```bash
     pip install selenium
+    ```
+* 安装Pillow:
+    ```bash
+    pip install Pillow
     ```
 * 配置个人信息：
   * 打开 gradesSpyer.py

@@ -101,7 +101,13 @@ class Mymail:
         # 开始循环
         try:
             while (True):
-                time.sleep(120)
+                counter = 0 #计数菌
+                while (counter < 40):
+                    time.sleep(3)
+                    driver.find_element_by_id("captchaResponse") #是否手动输入了验证码
+                    counter += 1
+                # time.sleep(120) 上面的while 相当于此
+
                 # 连接到POP3服务器:
                 server = poplib.POP3(self.pop3_server)
                 # 可以打开或关闭调试信息:
@@ -129,6 +135,8 @@ class Mymail:
                         break
                     continue
                 server.quit()
+        except NoSuchElementException: #手动输入了验证码
+            return 'manual'
         except KeyboardInterrupt:
             safequit()
 
@@ -157,7 +165,8 @@ def login(state,manual):
             captchaShot()
             mymail.mailMeCaptcha(state)
             capResult = mymail.recvCaptcha()
-            driver.find_element_by_id("captchaResponse").send_keys(capResult)
+            if(capResult != 'manual'):
+                driver.find_element_by_id("captchaResponse").send_keys(capResult)
         else: #通过手动填写验证码
             while(True): #死循环到找不到验证码输入框，产生错误跳转到finally
                 driver.find_element_by_id("captchaResponse")

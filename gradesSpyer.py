@@ -26,7 +26,7 @@ class Mymail:
         self.to_addr = '请在这里填写接收通知的邮箱' #收信息邮箱
         self.smtp_server = '请在这里填写服务端邮箱stmp服务器地址'#示例：'smtp.163.com'
         self.pop3_server = '请在这里填写服务端邮箱pop3服务器地址'#示例：'pop3.163.com'
-        self.server = smtplib.SMTP(self.smtp_server, 25)
+        self.server = smtplib.SMTP_SSL(self.smtp_server,465) #为兼容服务器和更好的安全性采用SSL 465端口登录
 
     def mailMeInfo(self,state,content):
         if(state == 0):

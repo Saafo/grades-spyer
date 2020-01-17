@@ -26,7 +26,7 @@ class Mymail:
         self.to_addr = '请在这里填写接收通知的邮箱' #收信息邮箱
         self.smtp_server = '请在这里填写服务端邮箱stmp服务器地址'#示例：'smtp.163.com'
         self.pop3_server = '请在这里填写服务端邮箱pop3服务器地址'#示例：'pop3.163.com'
-        self.server = smtplib.SMTP_SSL(self.smtp_server,465) #为兼容服务器和更好的安全性采用SSL 465端口登录
+        # self.server = smtplib.SMTP_SSL(self.smtp_server,465) #为兼容服务器和更好的安全性采用SSL 465端口登录
 
     def mailMeInfo(self,state,content):
         if(state == 0):
@@ -40,6 +40,7 @@ class Mymail:
         msg['subject'] = Header(subject,'utf-8')
         msg['from'] = 'GradesSpyer<'+self.from_addr+'>'
         msg['to'] = self.to_addr
+        self.server = smtplib.SMTP_SSL(self.smtp_server,465) #为兼容服务器和更好的安全性采用SSL 465端口登录
         self.server.set_debuglevel(1)    # 打印出和SMTP服务器交互的所有信息
         self.server.login(self.from_addr, self.password)   # 登录SMTP服务器
         self.server.sendmail(self.from_addr, [self.to_addr], msg.as_string())    # 发邮件
@@ -75,6 +76,7 @@ class Mymail:
         htm = MIMEText(html,'html','utf-8')
         msg.attach(htm)
         #发邮件
+        self.server = smtplib.SMTP_SSL(self.smtp_server,465) #为兼容服务器和更好的安全性采用SSL 465端口登录
         self.server.set_debuglevel(1)    # 打印出和SMTP服务器交互的所有信息
         self.server.login(self.from_addr, self.password)   # 登录SMTP服务器
         self.server.sendmail(self.from_addr, [self.to_addr], msg.as_string())    # 发邮件

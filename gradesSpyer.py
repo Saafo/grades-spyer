@@ -45,134 +45,34 @@ class Mymail:
         self.server.login(self.from_addr, self.password)   # 登录SMTP服务器
         self.server.sendmail(self.from_addr, [self.to_addr], msg.as_string())    # 发邮件
 
-
-    def mailMeCaptcha(self,state):
+    def mailMeLogin(self):
         #构造邮件
-        if(state == 0):
-            subject = '登录失效，请回复验证码以重新登录'
-        elif(state == 1):
-            subject = '验证码或密码错误，请尝试回复验证码以重新登录'
-        elif(state == 2):
-            subject = '启动程序，请回复验证码以登录'
+        subject = '登录失效，请远程连接桌面以登录'
 
         msg = MIMEMultipart('alternative')
         msg['subject'] = Header(subject,'utf-8')
         msg['from'] = 'GradesSpyer<'+self.from_addr+'>'
         msg['to'] = self.to_addr
 
-        img = open('./captchaImg.png','rb')
-        msgImage = MIMEImage(img.read())
-        img.close()
-        msg.attach(msgImage)
-        html = '''
-        <html>
-          <head></head>
-          <body>
-            <p>请将附件验证码作为`邮件主题`回复到本邮箱<br>
-            </p>
-          </body>
-        <html>
-        '''
-        htm = MIMEText(html,'html','utf-8')
-        msg.attach(htm)
         #发邮件
-        self.server = smtplib.SMTP_SSL(self.smtp_server,465) #为兼容服务器和更好的安全性采用SSL 465端口登录
+        self.server = smtplib.SMTP_SSL(self.smtp_server,465)
         self.server.set_debuglevel(1)    # 打印出和SMTP服务器交互的所有信息
         self.server.login(self.from_addr, self.password)   # 登录SMTP服务器
         self.server.sendmail(self.from_addr, [self.to_addr], msg.as_string())    # 发邮件
         with open("./time.txt",'w',encoding='utf-8') as f: #记录最近发送验证码的时间
             f.write(str(time.time()))
 
-    def recvCaptcha(self):
-        def guess_charset(msg):
-            charset = msg.get_charset()
-            if charset is None:
-                content_type = msg.get('Content-Type', '').lower()
-                pos = content_type.find('charset=')
-                if pos >= 0:
-                    charset = content_type[pos + 8:].strip()
-            return charset
-        def decode_str(s):
-            value, charset = decode_header(s)[0]
-            if charset:
-                value = value.decode(charset)
-            return value
-        with open("./time.txt",'r',encoding='utf-8') as f: #读取最近发送验证码的时间
-            sent_pic_captcha_time = float(f.read())
-
-        # 开始循环
-        try:
-            while (True):
-                counter = 0 #计数菌
-                while (counter < 40):
-                    time.sleep(3)
-                    driver.find_element_by_id("captchaResponse") #是否手动输入了验证码
-                    counter += 1
-                # time.sleep(120) 上面的while 相当于此
-
-                # 连接到POP3服务器:
-                server = poplib.POP3(self.pop3_server)
-                # 可以打开或关闭调试信息:
-                server.set_debuglevel(1)
-                # 身份认证:
-                server.user(self.from_addr)
-                server.pass_(self.password)
-                # list()返回所有邮件的编号:
-                resp, mails, octets = server.list()
-                for index in range(len(mails),len(mails)-5,-1):
-                    resp, lines, octets = server.retr(index)
-                    # lines存储了邮件的原始文本的每一行,可以获得整个邮件的原始文本:
-                    msg_content = b'\r\n'.join(lines).decode('utf-8')
-                    # 准备解析邮件:
-                    msg = Parser().parsestr(msg_content)
-                    raw_info_from = msg.get("From")
-                    hdr, from_addr = parseaddr(raw_info_from)
-                    if(from_addr == mymail.to_addr): #如果是指定邮箱发回来的邮件
-                        sent_string_captcha_time = time.mktime(time.strptime(msg.get("Date")[0:24], '%a, %d %b %Y %H:%M:%S'))
-                        #如果最近一条指定邮箱发来的邮件比最近发送的验证码时间晚 +100:修正163服务器与本地时间差
-                        if(sent_string_captcha_time + 100 > sent_pic_captcha_time): 
-                            captcha = decode_str(msg.get("Subject"))
-                            server.quit()
-                            return captcha
-                        break
-                    continue
-                server.quit()
-        except NoSuchElementException: #手动输入了验证码
-            return 'manual'
-        except KeyboardInterrupt:
-            safequit()
-
-
-def captchaShot():
-    #获取截图
-    driver.get_screenshot_as_file('./screenshot.png')
-    #获取指定元素位置
-    element = driver.find_element_by_id('captchaImg')
-    left = int(element.location['x'])
-    top = int(element.location['y'])
-    right = int(element.location['x'] + element.size['width'])
-    bottom = int(element.location['y'] + element.size['height'])
-    #通过Image处理图像
-    im = Image.open('./screenshot.png')
-    im = im.crop((2*left, 2*top, 2*right, 2*bottom)) #TODO不知道是不是和代码机是2k屏有关系
-    im.save('./captchaImg.png')
 
 def login(state,manual):
     driver.get("http://portal.uestc.edu.cn")
     try:
         driver.find_element_by_id("username").send_keys("请在这里填写信息门户账号")
         driver.find_element_by_id("password").send_keys("请在这里填写信息门户密码")
-        driver.find_element_by_id("captchaResponse").click()
-        if(manual == 0): #通过邮件自动填写验证码
-            captchaShot()
-            mymail.mailMeCaptcha(state)
-            capResult = mymail.recvCaptcha()
-            if(capResult != 'manual'):
-                driver.find_element_by_id("captchaResponse").send_keys(capResult)
-        else: #通过手动填写验证码
-            while(True): #死循环到找不到验证码输入框，产生错误跳转到finally
-                driver.find_element_by_id("captchaResponse")
-                time.sleep(3)
+        if(manual == 0): #通过邮件提醒
+            mymail.mailMeLogin()
+        while(True): #死循环到找不到验证码输入框，产生错误跳转到finally
+            driver.find_element_by_id("captchaResponse")
+            time.sleep(3)
         time.sleep(5)
         driver.find_elements_by_class_name("auth_login_btn")[0].click() #如果还停留在登录页，点击登录
     except KeyboardInterrupt:
@@ -302,7 +202,7 @@ def main(manual):
 if __name__ == '__main__':
     # 参数解析模块
     args = sys.argv[1:]
-    manual = 0
+    manual = 1
     try:
         opts, arg = getopt.getopt(args, "m", ["manual"])
     except getopt.GetoptError:

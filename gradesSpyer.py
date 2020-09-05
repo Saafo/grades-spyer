@@ -64,7 +64,8 @@ class Mymail:
 
 
 def login(state,manual):
-    driver.get("http://portal.uestc.edu.cn")
+    driver.get("http://eams.uestc.edu.cn/eams/home!childmenus.action?menu.id=844")
+    time.sleep(5)
     try:
         driver.find_element_by_id("username").send_keys("请在这里填写信息门户账号")
         driver.find_element_by_id("password").send_keys("请在这里填写信息门户密码")
@@ -83,6 +84,7 @@ def login(state,manual):
             driver.find_element_by_id("msg") #验证码或密码错误
         except NoSuchElementException:
             driver.get(final_score_table_url) #重定向，用来防止各种奇奇怪怪的教务系统错误
+            driver.add_cookie({'name' : 'semester.id', 'value' : '263', 'Domain' : 'eams.uestc.edu.cn', 'path' : '/eams/'}) # 设置当前学期
             driver.get(final_score_table_url) #跳过确认重复登录页面
             try:
                 driver.find_element_by_class_name("gridtable") #如果成功登陆，能获取课表
@@ -216,7 +218,7 @@ if __name__ == '__main__':
     # main module
     mymail = Mymail()
     driver = webdriver.Firefox(executable_path='./geckodriver')
-    final_score_table_url = "http://eams.uestc.edu.cn/eams/teach/grade/course/person!search.action?semesterId=243&projectType="
+    final_score_table_url = "http://eams.uestc.edu.cn/eams/teach/grade/course/person!search.action?semesterId=263&projectType="
     try: 
         main(manual)
     except KeyboardInterrupt:
@@ -225,4 +227,5 @@ if __name__ == '__main__':
         log(traceback.format_exc())
         mymail.mailMeInfo(1,time.asctime(time.localtime(time.time())) + '\n' +'错误信息：\n' + traceback.format_exc())
     finally: #不行就重启 重启能解决99%的问题
+        time.sleep(30)
         restart()

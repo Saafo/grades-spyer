@@ -65,4 +65,4 @@
 ### 关于没有采用Chrome的问题：
 Chrome的驱动程序chromedriver似乎是由第三方开发的，所以在用selenium控制Chrome时页面会与人工操作有些许不同，具体到本项目则是信息门户登录时，无法显示验证码，无奈只能用Firefox。
 
-Copyright &copy; 2020 Saafo. All Rights Reserved.
+Copyright &copy; 2020-2021 Saafo. All Rights Reserved.
